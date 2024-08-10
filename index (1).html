@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Payment QR Code Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        #qrcode {
+            margin: 20px auto;
+            display: inline-block;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .link-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .link-container a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>UPI Payment QR Code Generator</h1>
+        <input type="text" id="vpa" placeholder="Enter UPI ID (VPA)" required>
+        <input type="text" id="name" placeholder="Enter Payee Name" required>
+        <input type="text" id="amount" placeholder="Enter Amount (optional)">
+        <button onclick="generateUPIQRCode()">Generate QR Code</button>
+        <div id="qrcode"></div>
+        <div class="link-container">
+            <p>Payment Link:</p>
+            <a href="#" id="payment-link" target="_blank"></a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        function generateUPIQRCode() {
+            const vpa = document.getElementById("vpa").value.trim();
+            const name = document.getElementById("name").value.trim();
+            const amount = document.getElementById("amount").value.trim();
+
+            if (!vpa || !name) {
+                alert("Please enter both UPI ID and Payee Name.");
+                return;
+            }
+
+            // Create UPI string
+            let upiString = `upi://pay?pa=${vpa}&pn=${encodeURIComponent(name)}`;
+            if (amount) {
+                upiString += `&am=${amount}`;
+            }
+
+            // Clear previous QR code
+            document.getElementById("qrcode").innerHTML = "";
+
+            // Generate new QR code
+            new QRCode(document.getElementById("qrcode"), upiString);
+
+            // Generate payment link with intermediary page
+            const intermediaryLink = `redirect.html?upi=${encodeURIComponent(upiString)}`;
+            const linkElement = document.getElementById("payment-link");
+            linkElement.href = intermediaryLink;
+            linkElement.textContent = "Click here to make the payment";
+        }
+    </script>
+</body>
+</html>
